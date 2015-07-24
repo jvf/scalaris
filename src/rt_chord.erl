@@ -359,8 +359,6 @@ prev_index({I, J}) ->
 check_config() ->
     config:cfg_is_integer(chord_base) and
         config:cfg_is_greater_than_equal(chord_base, 2) and
-        config:cfg_is_integer(rt_size_use_neighbors) and
-        config:cfg_is_greater_than_equal(rt_size_use_neighbors, 0) and
         config:cfg_is_in(key_creator, [random, random_with_bit_mask]) and
         case config:read(key_creator) of
             random -> true;
