@@ -877,8 +877,10 @@ init(_Arg) -> [].
 -spec on(trace_event() | comm:message(), state()) -> state().
 on({log_send, _Time, TraceId, _From, _To, _UMsg, _LorG} = Msg, State) ->
     state_add_log_event(State, TraceId, Msg);
+
 on({log_recv, _Time, TraceId, _From, _To, _UMsg} = Msg, State) ->
     state_add_log_event(State, TraceId, Msg);
+
 on({log_info, _Time, TraceId, _From, _UMsg} = Msg, State) ->
     state_add_log_event(State, TraceId, Msg);
 
@@ -899,6 +901,13 @@ on({get_trace, Pid, TraceId, none}, State) ->
             comm:send(Pid, {get_trace_reply, lists:reverse(Msgs)})
     end,
     State;
+
+on({get_trace_ids, Requestor}, State) ->
+    TraceIds1 = [ Id || {Id, _Trace} <- State ],
+    TraceIds2 = lists:sort(TraceIds1),
+    comm:send(Requestor, {get_trace_ids_response, TraceIds2}),
+    State;
+
 on({cleanup, TraceId}, State) ->
     case lists:keytake(TraceId, 1, State) of
         {value, _Tuple, TupleList2} -> TupleList2;
@@ -927,9 +936,7 @@ own_passed_state_get()            -> erlang:get(trace_mpath).
 
 state_add_log_event(State, TraceId, Msg) ->
     NewEntry = case lists:keyfind(TraceId, 1, State) of
-                   false ->
-                       {TraceId, [Msg]};
-                   {TraceId, OldTrace} ->
-                       {TraceId, [Msg | OldTrace]}
+                   false -> {TraceId, [Msg]};
+                   {TraceId, OldTrace} -> {TraceId, [Msg | OldTrace]}
                end,
     lists:keystore(TraceId, 1, State, NewEntry).

@@ -36,8 +36,11 @@
 increment(Iterations) ->
     fun(Parent) ->
             Key = get_and_init_key(),
+            %% log:pal("bench_fun started ~s ~w", [Key, comm:this()]),
             {Diff, Aborts} = util:tc(fun increment_iter/3, [Key, Iterations, 0]),
+            %% log:pal("bench_fun stoped ~s ~w", [Key, comm:this()]),
             comm:send_local(Parent, {done, Diff, Aborts})
+            %% log:pal("bench_fun_sent ~s ~w", [Key, comm:this()])
     end.
 
 -spec increment_with_histo(integer()) -> fun().
@@ -98,16 +101,27 @@ inc(Key) ->
 increment_iter(_Key, 0, Aborts) ->
     Aborts;
 increment_iter(Key, Iterations, Aborts) ->
+    {KeyInt, _Rest}  = string:to_integer(Key),
+    IdInt = KeyInt + Iterations,
+    Id = list_to_atom(integer_to_list(IdInt)),
+    trace_mpath:start(Id),
     Result = inc(Key),
+    trace_mpath:stop(),
+    trace_mpath:cleanup(Id),
+    msg_delay:send_local(60, pid_groups:find_a(trace_mpath), {cleanup, Id}),
     case Result of
-        {ok}              -> increment_iter(Key, Iterations - 1, Aborts);
+        {ok}              ->
+            %% log:pal("~w ok in increment_iter on key: ~s", [comm:this(), Key]),
+            increment_iter(Key, Iterations - 1, Aborts);
         {fail, abort, [Key]}     ->
+            log:pal("~w fail abort in increment_iter on key: ~s", [comm:this(), Key]),
             timer:sleep(randoms:rand_uniform(1, erlang:max(2, 10 * Aborts + 1))),
             increment_iter(Key, Iterations, Aborts + 1);
         {fail, not_found} ->
+            log:pal("~w fail not_found in increment_iter on key: ~s", [comm:this(), Key]),
             timer:sleep(randoms:rand_uniform(1, erlang:max(2, 10 * Aborts + 1))),
             increment_iter(Key, Iterations, Aborts + 1);
-        X -> log:log(warn, "~p", [X])
+        X -> log:pal("foobarr ~p", [X])
     end.
 
 -spec increment_with_histo_iter(histogram:histogram(), string(), integer(), non_neg_integer()) -> any().

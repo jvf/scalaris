@@ -62,7 +62,8 @@ worker() ->
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 read_read_tx(Key1, Key2) ->
-    {_, Result} = api_tx:req_list([{read, Key1}, {read, Key2}, {commit}]),
+    %% {_, Result} = api_tx:req_list([{read, Key1}, {read, Key2}, {commit}]),
+    {_, Result} = api_tx:req_list([{write, Key1, Key2}, {read, Key1}, {commit}]),
     Result.
 
 read_read_iter(_Key1, _Key2, 0, Aborts) ->

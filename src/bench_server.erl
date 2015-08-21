@@ -129,17 +129,21 @@ start_link(ServiceGroup) ->
 run_threads(Threads, Bench) ->
     Self = self(),
     util:for_to(1, Threads,
-       fun(_X) ->
-           Pid = spawn_link(fun()->
-                         trace_mpath:thread_yield(),
-                         receive
-                             ?SCALARIS_RECV({start_thread}, ok)
-                         end,
-                         log:log(debug, "Bench is infected ~p", [proto_sched:infected()]),
-                         Bench(Self),
-                         trace_mpath:thread_yield()
-                       end),
-                         log:log(debug, "Sending to spawned Bench ~p", [proto_sched:infected()]),
-               comm:send_local(Pid, {start_thread})
-       end),
+                fun(_X) ->
+                        %% log:pal("starting thread nr ~w ~w", [_X, comm:this()]),
+                        Pid = spawn_link(fun()->
+                                                 %% log:pal("spawned thread ~w ~w", [_X, comm:this()]),
+                                                 trace_mpath:thread_yield(),
+                                                 receive
+                                                     ?SCALARIS_RECV({start_thread}, ok)
+                                                 end,
+                                                 %% log:pal("received start msg ~w ~w", [_X, comm:this()]),
+                                                 log:log(debug, "Bench is infected ~p", [proto_sched:infected()]),
+                                                 Bench(Self),
+                                                 %% log:pal("finished benchmark ~w ~w", [_X, comm:this()]),
+                                                 trace_mpath:thread_yield()
+                                         end),
+                        %% log:log(debug, "Sending to spawned Bench ~p", [proto_sched:infected()]),
+                        comm:send_local(Pid, {start_thread})
+                end),
     ok.
