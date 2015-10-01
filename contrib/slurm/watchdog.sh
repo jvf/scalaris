@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 source $(pwd)/env.sh
 
 function cleanup_node(){

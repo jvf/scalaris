@@ -33,13 +33,13 @@ METRICS="{value, {mean_troughput_overall, Mean}} = lists:keysearch(mean_troughpu
 LOGSTRING_INC="io:format('result data inc:~p:~p~n', [Mean, Latency])"
 LOGSTRING_QR="io:format('result data qr:~p:~p~n', [Mean, Latency])"
 
-THREADS=1024
-ITERATIONS=4
+THREADS=64
+ITERATIONS=500
 echo "running bench:increment($THREADS, $ITERATIONS)..."
 erl -setcookie "chocolate chip cookie" -name bench_ -noinput -eval "{ok, Res} = rpc:call('first@`hostname -f`', bench, increment, [$THREADS, $ITERATIONS]), $METRICS, $LOGSTRING_INC, halt(0)."
 
-THREADS=2048
-ITERATIONS=10
+THREADS=256
+ITERATIONS=500
 echo "running bench:increment($THREADS, $ITERATIONS)..."
 erl -setcookie "chocolate chip cookie" -name bench_ -noinput -eval "{ok, Res} = rpc:call('first@`hostname -f`', bench, quorum_read, [$THREADS, $ITERATIONS]), $METRICS, $LOGSTRING_QR, halt(0)."
 
