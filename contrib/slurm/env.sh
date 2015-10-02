@@ -12,7 +12,7 @@ export BEAMDIR=$SCALARIS_DIR/ebin
 
 
 export SHUFFLE_NODE_IDS=1
-export WATCHDOG_INTERVAL=10
+export WATCHDOG_INTERVAL=2
 
 function cleanup() {
     echo "Nodelist of the cancelled job: $SLURM_NODELIST"
