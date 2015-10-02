@@ -275,6 +275,8 @@ get_trace_raw(TraceId, Option) ->
     trace_mpath:thread_yield(),
     receive
         ?SCALARIS_RECV({get_trace_reply, Log}, Log)
+    after 3000 ->
+        []
     end.
 
 -spec cleanup() -> ok.
