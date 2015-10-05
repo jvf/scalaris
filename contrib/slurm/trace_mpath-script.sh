@@ -29,7 +29,7 @@ echo "Nodelist: $SLURM_NODELIST"
 
 sleep 3
 
-KEYS=512
+KEYS=256
 ITERS=8
 echo "$(date) running bench:increment($KEYS, $ITERS)..."
 METRICS="{value, {mean_troughput_overall, Mean}} = lists:keysearch(mean_troughput_overall, 1, Res), {value, {avg_latency_overall, Latency}} = lists:keysearch(avg_latency_overall, 1, Res)"
