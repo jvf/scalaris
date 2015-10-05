@@ -65,6 +65,8 @@
 %% useful in e.g. filter funs
 -export([normalize_pidinfo/1]).
 
+-export([traces_to_tex/1, traces_to_txt/1]).
+
 %% gen_component behaviour
 -export([start_link/1, init/1]).
 -export([on/2]). %% internal message handler as gen_component
@@ -226,6 +228,8 @@ get_trace(TraceId, Option) ->
          end || Event <- LogRaw],
     resolve_remote_pids(Trace).
 
+get_traces() -> get_trace(default).
+
 -spec resolve_remote_pids(Trace::trace()) -> trace().
 resolve_remote_pids(Trace) ->
     % remote pids are present in two forms (with each of them present!):
@@ -275,7 +279,7 @@ get_trace_raw(TraceId, Option) ->
     trace_mpath:thread_yield(),
     receive
         ?SCALARIS_RECV({get_trace_reply, Log}, Log)
-    after 3000 ->
+    after 9000 ->
         []
     end.
 
@@ -354,6 +358,25 @@ to_texfile(Trace, Filename) ->
         -> ok | {error, file:posix() | badarg | terminated}.
 to_texfile(Trace, Filename, ScaleX) ->
     to_texfile(Trace, Filename, fun time_delta/1, true, ScaleX).
+
+-spec traces_to_tex([trace()]) -> ok.
+traces_to_tex(Traces) ->
+[ begin
+      case trace_mpath:get_trace(X) of
+          [] -> ok;
+          Trace -> trace_mpath:to_texfile_no_time( Trace, lists:flatten(io_lib:format("../trace~s.tex", [atom_to_list(X)])))
+      end
+  end || X <- Traces].
+
+
+-spec traces_to_txt([trace()]) -> ok.
+traces_to_txt(Traces) ->
+[ begin
+	case trace_mpath:get_trace(X) of
+		[] -> ok;
+		Trace -> file:write_file(lists:flatten(io_lib:format("../trace~s.txt", [atom_to_list(X)])), io_lib:fwrite("~p.\n", [Trace]))
+	end
+  end || X <- Traces].
 
 %% @doc Write the trace to a LaTeX file (20 microseconds in the trace are 1 cm
 %%      in the plot). The representation will not have a time representation
