@@ -183,8 +183,14 @@ get_node_details([_|_] = Pids, Ring, TimeInMS) ->
             TimeInMS =:= 18000 ->
                 log:log(error,"[ ST ]: 18sec Timeout waiting for get_node_details_response from ~p",[Pids]),
                 continue;
-            TimeInMS >= 54000 ->
-                log:log(error,"[ ST ]: 54sec Timeout waiting for get_node_details_response from ~p",[Pids]),
+            TimeInMS =:= 54000 ->
+                log:log(error,"[ ST ]: 5400sec Timeout waiting for get_node_details_response from ~p",[Pids]),
+                continue;
+            TimeInMS =:= 162000 ->
+                log:log(error,"[ ST ]: 162sec Timeout waiting for get_node_details_response from ~p",[Pids]),
+                continue;
+            TimeInMS >= 486000 ->
+                log:log(error,"[ ST ]: 586sec Timeout waiting for get_node_details_response from ~p",[Pids]),
                 stop;
             true -> continue
     end,
