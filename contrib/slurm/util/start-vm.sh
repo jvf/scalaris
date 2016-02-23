@@ -8,16 +8,6 @@ LOCAL_OFFSET=${SLURM_LOCALID} # Node local task ID for the process within a job
 GLOBAL_OFFSET=${SLURM_PROCID} # relative process ID of the current process, 0 based
 
 start_vm(){
-    # local sleeptime=$((GLOBAL_OFFSET%SLURM_JOB_NUM_NODES+2))
-    # if ((GLOBAL_OFFSET<10)); then
-    #     local sleeptime=$((GLOBAL_OFFSET))
-    # elif ((GLOBAL_OFFSET<100)); then
-    #     local sleeptime=$((GLOBAL_OFFSET/2))
-    # else
-        # local sleeptime=$((GLOBAL_OFFSET/4))
-    # fi
-    # echo "$(hostname -s): sleeptime=${sleeptime}. GLOBAL_OFFSET=${GLOBAL_OFFSET}. LOCAL_OFFSET=${LOCAL_OFFSET}."
-
     # uncomment (incl line 24) to restrict the number of schedulers for one node only
     # local old_erl_sched_flags=$ERL_SCHED_FLAGS
     # [[ $GLOBAL_OFFSET = 0 ]] && ERL_SCHED_FLAGS="+S 1"
