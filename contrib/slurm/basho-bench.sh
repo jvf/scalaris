@@ -146,7 +146,9 @@ repeat_benchmark() {
         setup_directories
         create_result_dir
 
-        SCALARISCTL_PARAMS="-l $WD/$NAME/logs"
+        # SCALARISCTL_PARAMS="-l $WD/$NAME/logs"
+        local slogpath="/local/bzcfisch/slog/$(date +%y%m%d-%H%M)-$NAME"
+        SCALARISCTL_PARAMS="-l $slogpath"
         echo ${!SCALARISCTL_PARAMS@}=$SCALARISCTL_PARAMS
         COLLECTL_DIR=$WD/$NAME/collectl
         echo ${!COLLECTL_DIR@}=$COLLECTL_DIR
