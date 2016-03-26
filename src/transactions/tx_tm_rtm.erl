@@ -523,7 +523,7 @@ on({tx_tm_rtm_propose_yourself, Tid}, State) ->
     case ErrCodeTx of
         new -> ok; %% takeover is not necessary. Was finished successfully.
         _Any ->
-            log:log(info, "Takeover by RTM was necessary."),
+            log:log(warn, "Takeover by RTM was necessary."),
             Maj = quorum:majority_for_accept(config:read(replication_factor)),
             RTMs = tx_state_get_rtms(TxState),
             Role = state_get_role(State),
