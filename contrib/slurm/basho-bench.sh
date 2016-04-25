@@ -91,7 +91,7 @@ main() {
 main_value() {
     for VALUE_SIZE in $VALUE_SIZES; do
         local value=$(printf "%04i" $VALUE_SIZE)
-        PREFIX="value$value-"
+        PREFIX="value$value"
         log info "starting value benchmark with $VALUE_SIZE"
         repeat_benchmark
     done
