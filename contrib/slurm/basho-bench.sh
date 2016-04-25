@@ -28,26 +28,35 @@ trap 'trap_cleanup' SIGTERM SIGINT
 
 # Values defined here override settings from the configuration file
 
-# REPETITIONS=2
-# DURATION=5
-# LOAD_GENERATORS=4
-#
-# PARTITION="CUMU"
-# TIMEOUT=15
-# SLEEP1=30
-# SLEEP2=30
-#
-# SCALARIS_LOCAL=true
-# COLLECTL=true
-#
+REPETITIONS=1
+DURATION=1
+LOAD_GENERATORS=4
+# LG_HOSTS=("buildbot.zib.de" "buildbot2.zib.de" "cumulus.zib.de" "geomultisens.zib.de")
+LG_HOSTS=("buildbot.zib.de" "buildbot2.zib.de" "cumulus.zib.de")
+# LG_HOSTS=("buildbot.zib.de" "buildbot2.zib.de")
+# LG_HOSTS=("cumulus.zib.de"  "buildbot2.zib.de")
+# LG_HOSTS=("cumulus.zib.de")
+# LG_HOSTS=("buildbot.zib.de")
+# LG_HOSTS=("geomultisens.zib.de")
+
+TIMEOUT=20
+SLEEP1=60
+SLEEP2=15
+
+PARTITION_HOSTLIST="false"
+
+SCALARIS_LOCAL=true
+COLLECTL=true
+COLLECTL_INTERVAL="-i 1"
 # TOPLOG=true
 
 # size scalability series (only uncomment 'size', 'value' or 'load')
-# kind='size'
-# NODES_SERIES="1 2 4 8 16 32"
-# VMS_PER_NODE_SERIES="1"
-# export ERL_SCHED_FLAGS="+S 32"
-# LOAD_LEVEL=5
+KIND='size'
+NODES_SERIES="1 2 4 6 8 10 12 14 16 18 20 22 24 26 28 30 32"
+VMS_PER_NODE_SERIES="1"
+DHT_NODES_PER_VM=1
+# export ERL_SCHED_FLAGS="+S 8"
+LOAD_LEVEL=48
 
 # vary value sizes
 # KIND='value'
@@ -60,6 +69,8 @@ trap 'trap_cleanup' SIGTERM SIGINT
 # NODES=32
 # VMS_PER_NODE=1
 # WORKERS_PER_LG_SERIES="1 2 4 8 16 32 64 128 256 512 1024 2048"
+# DHT_NODES_PER_VM=1
+# export ERL_SCHED_FLAGS="+S 4"
 
 # KIND="lgs"
 # LOAD_GENERATORS_SERIES="4 6 8 10 12 15"
@@ -500,6 +511,7 @@ write_config() {
 {report_interval, 5}.
 {log_level, info}.
 
+{ringsize, $RINGSIZE}.
 {scalarisclient_nodes, [$HOSTLIST]}.
 EOF
 }
