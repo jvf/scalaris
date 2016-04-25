@@ -131,7 +131,7 @@ main_load(){
         log info "WORKERS_PER_LG=$WORKERS_PER_LG"
 
         WORKERS=$(printf "%04i" $WORKERS)
-        PREFIX="workers$WORKERS"
+        PREFIX="load$WORKERS"
         log info "starting load benchmark with $WORKERS ($WORKERS_PER_LG*$LOAD_GENERATORS)"
 
         repeat_benchmark
