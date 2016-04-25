@@ -180,7 +180,6 @@ repeat_benchmark() {
         start_scalaris
 
         wait_for_scalaris_startup
-        build_hostlist
 
         test_ring
         run_bbench
@@ -243,6 +242,7 @@ setup_directories(){
 
 
 print_env(){
+    echo PARTITION_HOSTLIST=$PARTITION_HOSTLIST
     echo KIND=$KIND
     if [[ $KIND == "load" ]]; then
         echo RINGSIZE=$((NODES*VMS_PER_NODE*DHT_NODES_PER_VM))
@@ -397,6 +397,7 @@ wait_for_scalaris_startup() {
 }
 
 test_ring() {
+    build_hostlist
     local retries=$1
     local res=0
     [[ -z "$retries" ]] && retries=0
@@ -448,6 +449,8 @@ stop_scalaris(){
 }
 
 build_hostlist() {
+    local start=$1
+    local length=$2
     local counter=0
     declare -a hosts
     NODELIST=$(scontrol show job $SLURM_JOBID | grep " NodeList" | awk -F= '{print $2}')
@@ -463,7 +466,11 @@ build_hostlist() {
         done
     done
     FIRST=${hosts[0]}
-    HOSTLIST=$(join "${hosts[@]}")
+    if [[ $PARTITION_HOSTLIST = true ]]; then
+        HOSTLIST=$(join "${hosts[@]:start:length}")
+    else
+        HOSTLIST=$(join "${hosts[@]}")
+    fi
 }
 
 join() {
@@ -502,10 +509,25 @@ run_bbench() {
     local no_of_hosts=${#LG_HOSTS[*]}
     local c # counter for indexing the LG_HOSTS array
 
+    # variables for hostlist partitioning
+    RINGSIZE=$((NODES*VMS_PER_NODE*DHT_NODES_PER_VM))
+    local quotient=$((RINGSIZE/LOAD_GENERATORS))
+    local remainder=$((RINGSIZE%LOAD_GENERATORS))
+    local start=0
+
     for i in $(seq 1 $LOAD_GENERATORS); do
         PARALLEL_ID=$i
         RANDOM_SEED="{$((7*$i)), $((11*$i)), $((5*$i))}"
-        write_config
+        length=$quotient
+        if [[ $remainder -gt 0 ]]; then
+            # distribute remainder over as much instances as possible
+            length=$((length+1))
+            remainder=$((remainder-1))
+        fi
+        build_hostlist $start $length
+        write_config $i
+        # write_config $i
+        start=$((start+=length))
 
         # build args. The ${var:+...} expands only, if the variable is set and non-empty
         local arg1=${SLURM_JOBID:+"--jobid=$SLURM_JOBID"}
