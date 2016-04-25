@@ -247,6 +247,7 @@ print_env(){
     echo SLEEP2=$SLEEP2
     echo "COLLECTL=$COLLECTL"
     echo "PARTITION=$PARTITION"
+    echo "VALUE_SIZE=$VALUE_SIZE"
 }
 
 check_compile(){
